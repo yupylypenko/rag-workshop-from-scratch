@@ -102,6 +102,72 @@ pyenv local 3.12.0
 You can skip the embedding step if you already have a database and want to experiment with different models. 
 `poetry run python -m rag_demo --skip-embedding-step`
 
+#### Chunking Strategy Options
+
+The improved chunking implementation supports multiple strategies:
+
+- **recursive_character** (default): Uses langchain's RecursiveCharacterTextSplitter which respects document structure (paragraphs, sentences, words) and includes overlap between chunks for better context preservation.
+
+- **sentence_transformer**: Uses SentenceTransformersTokenTextSplitter for semantic-aware chunking based on token boundaries.
+
+- **naive**: Original simple character-based splitting (kept for comparison, not recommended for production).
+
+Example usage:
+```bash
+# Use recursive character splitter with custom chunk size and overlap
+poetry run python -m rag_demo --chunking-strategy recursive_character --chunk-size 1024 --chunk-overlap 200
+
+# Use sentence transformer strategy
+poetry run python -m rag_demo --chunking-strategy sentence_transformer
+
+# Compare with original naive approach
+poetry run python -m rag_demo --chunking-strategy naive --chunk-size 2048
+```
+
+#### Two-Stage Retrieval with Reranking
+
+The RAG demo now supports **two-stage retrieval with reranking** to improve retrieval quality. This follows the approach described in [Pinecone's Rerankers Guide](https://www.pinecone.io/learn/series/rag/rerankers/).
+
+**How it works:**
+1. **Stage 1 (Vector Search)**: Retrieve a larger set of documents (e.g., top 25) using fast vector similarity search
+2. **Stage 2 (Reranking)**: Use a cross-encoder reranker model to rerank the retrieved documents and select the most relevant ones (e.g., top 5)
+
+**Why use reranking?**
+- **Better accuracy**: Rerankers process query-document pairs together, avoiding information loss from vector compression
+- **Maximizes recall**: Retrieve more documents initially, then rerank to get the best ones
+- **Improves LLM performance**: Better context leads to better answers
+
+**Usage:**
+```bash
+# Enable reranking (recommended for better results)
+poetry run python -m rag_demo --use-reranker
+
+# Customize retrieval and reranking parameters
+poetry run python -m rag_demo --use-reranker --retrieval-top-k 30 --rerank-top-n 5
+
+# Use a different reranker model
+poetry run python -m rag_demo --use-reranker --reranker-model "BAAI/bge-reranker-large"
+
+# Without reranking (single-stage retrieval, faster but less accurate)
+poetry run python -m rag_demo
+```
+
+**Reranking Options:**
+- `--use-reranker`: Enable two-stage retrieval with reranking
+- `--retrieval-top-k`: Number of documents to retrieve in first stage (default: 25)
+- `--rerank-top-n`: Number of top documents after reranking (default: 5)
+- `--reranker-model`: Reranker model to use (default: BAAI/bge-reranker-base)
+
+**Example Output with Reranking:**
+```
+Stage 1 (Vector Search): Retrieved 25 documents
+Vector search scores: ['45.23', '44.12', '43.89', ...]
+
+Stage 2 (Reranking): Reranking 25 documents...
+Reranked to top 5 documents
+Reranked scores: ['0.9234', '0.8912', '0.8765', '0.8456', '0.8123']
+```
+
 ### Check chunks table first 5 rows
 ```
 psql -h localhost -p 6432 -U postgres rag_demo -c "SELECT * FROM chunks LIMIT 5;"
