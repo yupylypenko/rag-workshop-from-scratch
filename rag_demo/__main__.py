@@ -1,6 +1,7 @@
 ### Utility libraries
 import argparse
 import os
+import sys
 import time
 from dotenv import load_dotenv
 import requests
@@ -16,6 +17,9 @@ from rag_demo.chunking import ChunkingConfig, ChunkingStrategy, chunk_text
 
 ### Reranking for two-stage retrieval
 from rag_demo.reranker import Reranker
+
+### Query router for malicious intent detection
+from rag_demo.router import QueryRouter, is_query_safe
 
 ### Constants
 load_dotenv()
@@ -81,6 +85,11 @@ parser.add_argument(
     default=RERANKER_MODEL,
     help=f"Reranker model to use (default: {RERANKER_MODEL})",
 )
+parser.add_argument(
+    "--disable-query-router",
+    action="store_true",
+    help="Disable the malicious intent query router guardrail",
+)
 args = parser.parse_args()
 
 ### Useful functions [can go to a utils.py file]
@@ -117,6 +126,14 @@ chunking_config = ChunkingConfig(
 
 print(f"Using chunking strategy: {chunking_config.strategy.value}")
 print(f"Chunk size: {chunking_config.chunk_size}, Overlap: {chunking_config.chunk_overlap}")
+
+# Initialize query router unless disabled
+query_router: QueryRouter | None = None
+if args.disable_query_router:
+    print("Query router disabled (processing all queries)")
+else:
+    query_router = QueryRouter()
+    print("Query router enabled: malicious intent checks active")
 
 # Initialize reranker if enabled
 reranker = None
@@ -163,6 +180,16 @@ if not args.skip_embedding_step:
     db.commit()
 
 question = input("\nEnter question: ")
+
+if query_router is not None:
+    is_allowed, message = is_query_safe(question, query_router)
+    print(f"Query router decision: {message}")
+    if not is_allowed:
+        print(
+            "This query was blocked because it may contain malicious intent."
+            " Please rephrase your request with benign language."
+        )
+        sys.exit(0)
 
 # Create embedding from question.  Many RAG applications use a query rewriter before querying
 # the vector database.  For more information on query rewriting, see this whitepaper:

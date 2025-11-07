@@ -168,6 +168,20 @@ Reranked to top 5 documents
 Reranked scores: ['0.9234', '0.8912', '0.8765', '0.8456', '0.8123']
 ```
 
+#### Query Router Guardrail
+
+Following the guidance in the [LangChain overview](https://docs.langchain.com/oss/python/langchain/overview), the demo now includes a lightweight **query router** to catch obvious malicious intent (prompt-injection phrases, destructive shell commands, credential harvesting attempts) before any retrieval or model call happens.
+
+- Enabled by default; disable with `--disable-query-router`
+- Checks for suspicious keywords and rejects empty/oversized queries
+- Blocks the request and prompts the user to rephrase if the query is unsafe
+
+Example guardrail output:
+```
+Query router decision: Query rejected: detected potentially malicious intent (contains disallowed instructions).
+This query was blocked because it may contain malicious intent. Please rephrase your request with benign language.
+```
+
 ### Check chunks table first 5 rows
 ```
 psql -h localhost -p 6432 -U postgres rag_demo -c "SELECT * FROM chunks LIMIT 5;"
