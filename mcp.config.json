@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "servers": {
+    "weather-mcp": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/weather-mcp"],
+      "workingDirectory": ".",
+      "env": {
+        "OPENWEATHER_API_KEY": "${OPENWEATHER_API_KEY}" 
+      },
+      "metadata": {
+        "description": "Provides current weather conditions and forecasts via the Model Context Protocol"
+      }
+    }
+  },
+  "prompts": {
+    "enrich-with-weather": {
+      "description": "Pull in real-time weather context to augment RAG answers.",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are assisting with retrieval-augmented generation for the rag-workshop demo.\nUse the Weather MCP server to gather current conditions that match the user question. Summarise the weather data in 2-3 sentences and explain how it is relevant to the query before handing back to the main agent."
+        }
+      ],
+      "mcpServers": ["weather-mcp"]
+    }
+  }
+}
