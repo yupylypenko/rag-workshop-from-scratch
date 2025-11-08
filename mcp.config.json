@@ -8,6 +8,19 @@
       "metadata": {
         "description": "Provides US National Weather Service data via the Model Context Protocol"
       }
+    },
+    "jira-mcp": {
+      "command": "npx",
+      "args": ["-y", "jira-mcp"],
+      "workingDirectory": ".",
+      "env": {
+        "JIRA_INSTANCE_URL": "${JIRA_INSTANCE_URL}",
+        "JIRA_USER_EMAIL": "${JIRA_USER_EMAIL}",
+        "JIRA_API_KEY": "${JIRA_API_KEY}"
+      },
+      "metadata": {
+        "description": "Interact with Atlassian JIRA via the Model Context Protocol (JQL search, issue details)"
+      }
     }
   },
   "prompts": {
@@ -20,6 +33,16 @@
         }
       ],
       "mcpServers": ["weather-mcp"]
+    },
+    "jira-issue-context": {
+      "description": "Fetch JIRA issue context (search + issue details) before answering project queries.",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are preparing a response involving project delivery updates. Use the JIRA MCP server to execute JQL searches or fetch specific issue details mentioned in the user's request. Summarise the issue status, assignee, and latest update, then return the consolidated context to the main agent."
+        }
+      ],
+      "mcpServers": ["jira-mcp"]
     }
   }
 }
