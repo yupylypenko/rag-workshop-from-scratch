@@ -184,7 +184,7 @@ This query was blocked because it may contain malicious intent. Please rephrase 
 
 ### MCP Weather Enrichment
 
-To enrich RAG answers with real-time weather context, connect your IDE to the Weather MCP server using the provided `mcp.config.json`. Detailed steps live in [`docs/MCP_SETUP.md`](docs/MCP_SETUP.md). The setup follows the routing/guardrail recommendations from the [LangChain overview](https://docs.langchain.com/oss/python/langchain/overview).
+To enrich RAG answers with real-time weather context, connect your IDE to the published `@iflow-mcp/weather-mcp` server using the provided `mcp.config.json` (no API key needed). Detailed steps live in [`docs/MCP_SETUP.md`](docs/MCP_SETUP.md). The setup follows the routing/guardrail recommendations from the [LangChain overview](https://docs.langchain.com/oss/python/langchain/overview).
 
 ### Check chunks table first 5 rows
 ```

@@ -11,15 +11,16 @@ Most modern IDEs (Cursor, VS Code MCP extension, JetBrains AI) support MCP by lo
 npx -y @modelcontextprotocol/weather-mcp --help
 ```
 
-## 2. Provide an API key
+## 2. Install Node.js/npm
 
-The Weather MCP uses the OpenWeather API. Create a free account at <https://openweather.co.uk> and export the key before launching your IDE:
+The published package runs via `npx`. Make sure Node.js ≥ 18 is available:
 
 ```bash
-export OPENWEATHER_API_KEY="sk-..."
+sudo apt update
+sudo apt install npm
 ```
 
-> **Tip:** add the variable to your shell profile (e.g., `~/.bashrc`) so the IDE inherits it automatically.
+No API key is required—the server fetches data from the US National Weather Service.
 
 ## 3. Review `mcp.config.json`
 
@@ -31,7 +32,7 @@ The repository now ships with `mcp.config.json` in the project root:
   "servers": {
     "weather-mcp": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/weather-mcp"],
+      "args": ["-y", "@iflow-mcp/weather-mcp"],
       "workingDirectory": ".",
       "env": {
         "OPENWEATHER_API_KEY": "${OPENWEATHER_API_KEY}"

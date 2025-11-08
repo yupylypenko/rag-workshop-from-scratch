@@ -3,13 +3,10 @@
   "servers": {
     "weather-mcp": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/weather-mcp"],
+      "args": ["-y", "@iflow-mcp/weather-mcp"],
       "workingDirectory": ".",
-      "env": {
-        "OPENWEATHER_API_KEY": "${OPENWEATHER_API_KEY}" 
-      },
       "metadata": {
-        "description": "Provides current weather conditions and forecasts via the Model Context Protocol"
+        "description": "Provides US National Weather Service data via the Model Context Protocol"
       }
     }
   },
